@@ -1,0 +1,16 @@
+Project 2
+Operating Systems - 3460:426
+
+Author: Ryan Wake - raw93@zips.uakron.edu
+
+Use ./compileOS.sh to compile the kernel.  If file is not executable run 'chmod +x compileOS.sh'
+Use ./loadFile fib to load the fib program into the OS.
+Run the OS with 'bochs -f osxterm.txt', if bochs hangs terminate the command and run it again, sometimes it takes multiple times for the OS to boot.
+
+
+Once the OS boots you will see the BlackDOS splash screen, it will ask you to input a line, type something in then press enter.  It will display the line you type.
+Next it will ask you to input a number, type in an integer and press enter, it will display what number you typed.
+
+If you would like to test each function, readSector, readFile, launchProgram, uncomment the specified lines within main.
+I have provided the fib file compiled and ready to run.
+As you provide the asked for input in the OS it will eventually ask how many trees you want to fib, enter any number and press enter and the fib program should calculate for you.
