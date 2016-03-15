@@ -31,9 +31,11 @@ void main()
 {
    char buffer[13312];
    int size;
+   /* Uncomment this line to test writeSector */
+   /* char* test = "asdf";*/
    char line[80];
    int x;
-   
+
    makeInterrupt21();
    interrupt(33,12,2,8,0);   
    
@@ -66,9 +68,15 @@ void main()
   /* interrupt(33,3,"msg\0",buffer,&size);*/
   /* interrupt(33,0,buffer,0,0);*/
 
- /* Uncomment these two lines to test launchProgram, change fib to desired filename */
-   interrupt(33,4,"fib\0",2,0);
-   interrupt(33,0,"Error if this executes\r\n\0",0,0);
+  /* Uncomment these two lines to test launchProgram, change fib to desired filename */
+  /* interrupt(33,4,"fib\0",2,0);*/
+  /* interrupt(33,0,"Error if this executes\r\n\0",0,0);*/
+
+  /* Uncomment this next line and the line at the top to test writeSector */
+  /* interrupt(33,6,test,30,0);*/
+
+  /* Uncomment this line to test deletFile */
+   interrupt(33,7,"asdf\0",0,0);
    while(1);
 }
 
@@ -303,6 +311,48 @@ void stop()
    while(1);
 }
 
+void writeSector(char* buffer, int sector)
+{
+   int relSecNo = 0;
+   int headNo = 0;
+   int trackNo = 0;
+   int cx = 0;
+   int dx = 0;
+
+/* Do the math needed to get cx, dx to pass to the interrupt */
+   relSecNo = (mod(sector,18)) + 1;
+   headNo = mod((div(sector,18)),2);
+   trackNo = div(sector,36);
+   cx = trackNo * 256 + relSecNo;
+   dx = headNo * 256;
+
+   interrupt(19,769,buffer,cx,dx);
+}
+
+void deleteFile(char* name)
+{
+   char dirBuffer[512];
+   char mapBuffer[512];
+   int index = 0;
+   int found;
+
+   readSector(dirBuffer,2);
+   readSector(mapBuffer,1);
+
+   while(dirBuffer[index] != 0x0)
+   {
+      if (strcmp(name,&dirBuffer[index]))
+      {
+         found = index + 6;
+         return;
+      }
+
+      index = index + 32;
+   }
+   error(0);
+   return;
+}
+
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
    switch(ax)
@@ -324,6 +374,18 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
          break;
       case 5:
          stop();
+         break;
+      case 6:
+         writeSector(bx,cx);
+         break;
+      case 7:
+         deleteFile(bx);
+         break;
+      case 8:
+         /*writeFile(bx,cx,dx);*/
+         break;
+      case 11:
+         interrupt(25,0,0,0,0);
          break;
       case 12:
          clearScreen(bx,cx);
