@@ -32,7 +32,7 @@ void main()
    char buffer[13312];
    int size;
    /* Uncomment this line to test writeSector */
-   /* char* test = "asdf";*/
+   /*char* test = "asdf";*/
    char line[80];
    int x;
 
@@ -69,14 +69,19 @@ void main()
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two lines to test launchProgram, change fib to desired filename */
-  /* interrupt(33,4,"fib\0",2,0);*/
+   interrupt(33,4,"Shell\0",2,0);
+   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
   /* interrupt(33,0,"Error if this executes\r\n\0",0,0);*/
 
   /* Uncomment this next line and the line at the top to test writeSector */
   /* interrupt(33,6,test,30,0);*/
 
   /* Uncomment this line to test deletFile */
-   interrupt(33,7,"asdf\0",0,0);
+  /* interrupt(33,7,"asdf\0",0,0);*/
+
+  /* Uncomment this line to test writeFile */
+   interrupt(33,8,"asdf\0","testing\0",1);
+
    while(1);
 }
 
@@ -308,7 +313,7 @@ void runProgram(char* name, int segment)
 
 void stop()
 {
-   while(1);
+   launchProgram(8192);
 }
 
 void writeSector(char* buffer, int sector)
@@ -344,13 +349,43 @@ void deleteFile(char* name)
       if (strcmp(name,&dirBuffer[index]))
       {
          found = index + 6;
+         dirBuffer[index] = 0x0;
+         while(dirBuffer[found] != 0x0)
+         {
+            mapBuffer[dirBuffer[found]] = 0x0;
+            found++;
+         }
+
+         writeSector(&dirBuffer,2);
+         writeSector(&mapBuffer,1);
          return;
       }
 
       index = index + 32;
    }
+
    error(0);
    return;
+}
+
+void writeFile(char* name, char* buffer, int numberOfSectors)
+{
+   char dirBuffer[512];
+   char mapBuffer[512];
+   int index = 0;
+
+   readSector(dirBuffer,2);
+   readSector(mapBuffer,1);
+
+   while(dirBuffer[index] != 0x0)
+   {
+      if(strcmp(name,&dirBuffer[index]))
+      {
+         error(1);
+         return;
+      }
+      index = index + 32;
+   }
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
@@ -382,7 +417,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
          deleteFile(bx);
          break;
       case 8:
-         /*writeFile(bx,cx,dx);*/
+         writeFile(bx,cx,dx);
          break;
       case 11:
          interrupt(25,0,0,0,0);
