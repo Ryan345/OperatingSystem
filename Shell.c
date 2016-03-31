@@ -51,7 +51,7 @@ void main()
 int strcmp(char* str1, char* str2)
 {
 /* Compare the char arrays index by index to see if they match */
-   while(*str1 != '\0')
+   while(*str1 != '\0' && *str1 != ' ')
    {
       if(*str1 != *str2)
          return 0;
