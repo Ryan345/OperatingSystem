@@ -47,7 +47,7 @@ void main()
    interrupt(33,0,"     \\/          \\/     \\/     \\/    \\/         \\/ \r\n\0",0,0);
    interrupt(33,0," V. 1.02, C. 2016. Based on a project by M. Black. \r\n\0",0,0);
    interrupt(33,0," Author(s): Ryan Wake.\r\n\r\n\0",0,0);
-   
+/*   
    interrupt(33,0,"Hola mondo.\r\n\0",0,0);
    interrupt(33,0,"Enter a line: \0",0,0);
    interrupt(33,1,line,0,0);
@@ -59,6 +59,7 @@ void main()
    interrupt(33,0,"\r\nYou entered: \0",0,0);
    interrupt(33,13,x,0,0);
    interrupt(33,0,"\r\n\0",0,0);
+*/
 
   /* Uncomment these two to test readSector */
   /* interrupt(33,2,buffer,30,0);*/

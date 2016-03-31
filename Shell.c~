@@ -1,0 +1,15 @@
+#include "blackdos.h"
+
+void main()
+{
+   char* x;
+
+
+   PRINTS("cxxxx][===blackdos===> \0");
+
+   /* Takes command line input */
+   SCANN(x);
+   STRCMP(x,"asdf\0");
+   PRINTS("\r\n\0");
+}
+
