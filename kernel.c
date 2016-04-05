@@ -310,6 +310,7 @@ void runProgram(char* name, int segment)
    }
 /* Launch the program */
    launchProgram(newSeg);
+   return;
 }
 
 void stop()

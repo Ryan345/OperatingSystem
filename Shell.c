@@ -2,15 +2,16 @@ void main()
 {
    char x[512];
    int i;
-   char* y = "boot\0";
-   char* z = "cls\0";
-   interrupt(33,12,2,8,0);
+   char buffer[512];
+   int size;
+
    while(1)
    {
       interrupt(33,0,"cxxxx][===blackdos===> \0",0,0);
 
       /* Takes command line input */
       interrupt(33,1,x,0,0);
+      interrupt(33,0,"\r\n\0",0,0);
       if(strcmp(x,"boot\0") == 1)
       {
          interrupt(33,11,0,0,0);
@@ -21,6 +22,7 @@ void main()
          {
             interrupt(33,0,"\r\n\0",0,0);
          }
+
          interrupt(33,12,2,8,0);
       }
       else if(strcmp(x,"help\0") == 1)
@@ -37,6 +39,27 @@ void main()
          interrupt(33,0,"run <file>             Executes specified file.\r\n\0",0,0);
          interrupt(33,0,"tweet <file>           Creates a file, and asks for text input.\r\n\0",0,0);
          interrupt(33,0,"type <file>            Displays contents of specified file.\r\n\0",0,0);
+      }
+      else if(strcmp(x,"echo\0") == 1)
+      {
+         interrupt(33,0,"\r\n\0",0,0);
+         interrupt(33,0,x+5,0,0);
+      }
+      else if(strcmp(x,"type\0") == 1)
+      {
+         buffer[0] = 0x0;
+         interrupt(33,3,x+5,buffer,&size);
+         if (buffer[0] != 0x0)
+         {
+            interrupt(33,0,"\r\n\r\nContents of file: \0",0,0);
+            interrupt(33,0,x+5,0,0);
+            interrupt(33,0,"\r\n\r\n\0",0,0);
+            interrupt(33,0,buffer,0,0);
+         }
+      }
+      else if(strcmp(x,"run\0") == 1)
+      {
+         interrupt(33,4,x+4,4,0);
       }
       else
       {
