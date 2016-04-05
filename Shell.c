@@ -7,6 +7,8 @@ void loadF(char*,char*,int*);
 void runF(char*);
 void delF(char*);
 void dir();
+void tweet(char*);
+void copy(char*);
 
 void main()
 {
@@ -19,8 +21,9 @@ void main()
       interrupt(33,0,"cxxxx][===blackdos===> \0",0,0);
 
       /* Takes command line input */
-      interrupt(33,1,x,0,0);
-      interrupt(33,0,"\r\n\0",0,0);
+      SCANS(x);
+      PRINTS("\r\n\0");
+
       if(strcmp(x,"boot\0") == 1)
       {
          BOOT;
@@ -53,6 +56,14 @@ void main()
       {
          dir();
       }
+      else if(strcmp(x,"tweet\0") == 1)
+      {
+         tweet(x+6);
+      }
+      else if(strcmp(x,"cp\0") == 1)
+      {
+         copy(x+3);
+      }
       else
       {
          interrupt(33,0,"\r\nBad command or filename\r\n\0",0,0);
@@ -60,6 +71,27 @@ void main()
       interrupt(33,0,"\r\n\0",0,0);
    }
    END;
+}
+void copy(char* files)
+{
+   char fName1[6];
+   char* fName2;
+   int i = 0;
+
+   while(*files != ' ')
+   {
+      fName1[i] = *files;
+      ++i;
+      files++;
+   }
+   PRINTS(fName1);
+}
+void tweet(char* fName)
+{
+   char buffer[140];
+   PRINTS("Enter text to write to file, end with Enter key.\r\n\0");
+   SCANS(buffer);
+   WRITEF(fName,buffer,1);
 }
 
 void dir()

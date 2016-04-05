@@ -66,12 +66,12 @@ void main()
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two to test read file */
-  /* interrupt(33,3,"msg\0",buffer,&size);*/
+  /* interrupt(33,3,"testin\0",buffer,&size);*/
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two lines to test launchProgram, change fib to desired filename */
-   /*interrupt(33,4,"Shell\0",2,0);
-   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);*/
+   interrupt(33,4,"Shell\0",2,0);
+   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
   /* interrupt(33,0,"Error if this executes\r\n\0",0,0);*/
 
   /* Uncomment this next line and the line at the top to test writeSector */
@@ -81,7 +81,7 @@ void main()
   /* interrupt(33,7,"asdf\0",0,0);*/
 
   /* Uncomment this line to test writeFile */
-   interrupt(33,8,"asdf\0",test,1);
+   interrupt(33,8,"asdf\0",test,2);
 
    while(1);
 }
@@ -377,6 +377,8 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
    int size = 0;
    int i = 0;
    int found = 0;
+   int y = 1;
+
    /* Read the directory and map sectors */
    readSector(dirBuffer,2);
    readSector(mapBuffer,1);
@@ -410,27 +412,38 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
                *name++;
             }
          }
-         for(index = 6; index<32; ++index)
-         {
-            for(i = 0; i<49; ++i)
+/*         while(y <= numberOfSectors)
+         {*/
+            for(index = 6; index<32; ++index)
             {
-               if (mapBuffer[i] == 0x0)
+               for(i = 1; i<50; ++i)
                {
-                  /* Write to the map that the sector is taken, the write that sector to the directory */
-                  mapBuffer[i+1] = 0xff;
-                  dirBuffer[size*32+index] = i+1;
-                  found = 1;
+                  if (mapBuffer[i] == 0x0)
+                  {
+                     /* Write to the map that the sector is taken, the write that sector to the directory */
+                     mapBuffer[i] = 0xff;
+                     dirBuffer[size*32+index] = i;
+                     found = 1;
+                     break;
+                  }
+               }
+               if (found == 1)
+               {
                   break;
                }
             }
-            if (found == 1)
+         /*   if (found == 1)
             {
                break;
             }
-         }
+         }*/
 
          /* Write the data to the sectors */
-         writeSector(buffer,i+1);
+         /*for(index = 0; index < numberOfSectors; ++index)
+         {*/
+            writeSector(buffer,i);
+            buffer = buffer + 512;
+         //}
          writeSector(mapBuffer,1);
          writeSector(dirBuffer,2);
          return;
