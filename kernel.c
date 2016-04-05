@@ -31,8 +31,8 @@ void main()
 {
    char buffer[13312];
    int size;
-   /* Uncomment this line to test writeSector */
-   /*char* test = "asdf";*/
+   /* Uncomment this line to test writeSector or writeFile */
+   char* test = "testing1";
    char line[80];
    int x;
 
@@ -70,8 +70,8 @@ void main()
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two lines to test launchProgram, change fib to desired filename */
-   interrupt(33,4,"Shell\0",2,0);
-   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
+   /*interrupt(33,4,"Shell\0",2,0);
+   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);*/
   /* interrupt(33,0,"Error if this executes\r\n\0",0,0);*/
 
   /* Uncomment this next line and the line at the top to test writeSector */
@@ -81,7 +81,7 @@ void main()
   /* interrupt(33,7,"asdf\0",0,0);*/
 
   /* Uncomment this line to test writeFile */
-   interrupt(33,8,"asdf\0","testing\0",1);
+   interrupt(33,8,"asdf\0",test,1);
 
    while(1);
 }
@@ -97,7 +97,6 @@ void printString(char* c)
 
 void readString(char* c)
 {
-   
    int index = 0;
 
    while(*c != 0xD)
@@ -375,10 +374,14 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
    char dirBuffer[512];
    char mapBuffer[512];
    int index = 0;
-
+   int size = 0;
+   int i = 0;
+   int found = 0;
+   /* Read the directory and map sectors */
    readSector(dirBuffer,2);
    readSector(mapBuffer,1);
 
+   /* Make sure the file doesn't already exist */
    while(dirBuffer[index] != 0x0)
    {
       if(strcmp(name,&dirBuffer[index]))
@@ -388,6 +391,52 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
       }
       index = index + 32;
    }
+
+   for (size = 0; size < 16; ++size)
+   {
+      /* Write the filename to the directory */
+      if(dirBuffer[size*32] == 0)
+      {
+         for(i = 0; i<5; ++i)
+         {
+            if (*name == 0x0)
+            {
+               dirBuffer[(size*32)+i] = 0x0;
+               *name++;
+            }
+            else
+            {
+               dirBuffer[(size*32)+i] = *name;
+               *name++;
+            }
+         }
+         for(index = 6; index<32; ++index)
+         {
+            for(i = 0; i<49; ++i)
+            {
+               if (mapBuffer[i] == 0x0)
+               {
+                  /* Write to the map that the sector is taken, the write that sector to the directory */
+                  mapBuffer[i+1] = 0xff;
+                  dirBuffer[size*32+index] = i+1;
+                  found = 1;
+                  break;
+               }
+            }
+            if (found == 1)
+            {
+               break;
+            }
+         }
+
+         /* Write the data to the sectors */
+         writeSector(buffer,i+1);
+         writeSector(mapBuffer,1);
+         writeSector(dirBuffer,2);
+         return;
+      }
+   }
+   return;
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
