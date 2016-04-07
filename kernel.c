@@ -70,8 +70,8 @@ void main()
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two lines to test launchProgram, change fib to desired filename */
-   interrupt(33,4,"Shell\0",2,0);
-   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
+  /* interrupt(33,4,"Shell\0",2,0);
+   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);*/
   /* interrupt(33,0,"Error if this executes\r\n\0",0,0);*/
 
   /* Uncomment this next line and the line at the top to test writeSector */
@@ -412,8 +412,8 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
                *name++;
             }
          }
-/*         while(y <= numberOfSectors)
-         {*/
+         while(y <= numberOfSectors)
+         {
             for(index = 6; index<32; ++index)
             {
                for(i = 1; i<50; ++i)
@@ -423,27 +423,26 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
                      /* Write to the map that the sector is taken, the write that sector to the directory */
                      mapBuffer[i] = 0xff;
                      dirBuffer[size*32+index] = i;
+                     writeSector(buffer,i);
+                     buffer = buffer + 512;
                      found = 1;
                      break;
                   }
                }
-               if (found == 1)
+               if (found == 1 && y >= numberOfSectors)
                {
+writeInt(y);
                   break;
                }
             }
-         /*   if (found == 1)
+            if (found == 1 && y >= numberOfSectors)
             {
                break;
             }
-         }*/
+            ++y;
+         }
 
          /* Write the data to the sectors */
-         /*for(index = 0; index < numberOfSectors; ++index)
-         {*/
-            writeSector(buffer,i);
-            buffer = buffer + 512;
-         //}
          writeSector(mapBuffer,1);
          writeSector(dirBuffer,2);
          return;
