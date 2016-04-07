@@ -101,6 +101,7 @@ void dir()
    int index = 0;
    int i;
    int runs = 0;
+   int size = 0;
 
    READS(buffer,2);
    while(buffer[index] != 0x0)
@@ -109,8 +110,18 @@ void dir()
       {
          fname[i] = buffer[index + i];
       }
+      for (i = 6; i<32; ++i)
+      {
+         if (buffer[index + i] != 0x0)
+         {
+PRINTS("Incremented");
+            ++size;
+         }
+      }
       PRINTS("File name: \0");
       PRINTS(fname);
+      PRINTS("        File size: \0");
+      PRINTN(size);
       PRINTS("\r\n\0");
 
       runs = runs + 6;

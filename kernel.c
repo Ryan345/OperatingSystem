@@ -32,7 +32,7 @@ void main()
    char buffer[13312];
    int size;
    /* Uncomment this line to test writeSector or writeFile */
-   char* test = "testing1";
+   /*char* test = "testing1";*/
    char line[80];
    int x;
 
@@ -66,12 +66,12 @@ void main()
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two to test read file */
-  /* interrupt(33,3,"testin\0",buffer,&size);*/
+  /* interrupt(33,3,"asdf\0",buffer,&size);*/
   /* interrupt(33,0,buffer,0,0);*/
 
   /* Uncomment these two lines to test launchProgram, change fib to desired filename */
-  /* interrupt(33,4,"Shell\0",2,0);
-   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);*/
+   interrupt(33,4,"Shell\0",2,0);
+   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
   /* interrupt(33,0,"Error if this executes\r\n\0",0,0);*/
 
   /* Uncomment this next line and the line at the top to test writeSector */
@@ -81,7 +81,7 @@ void main()
   /* interrupt(33,7,"asdf\0",0,0);*/
 
   /* Uncomment this line to test writeFile */
-   interrupt(33,8,"asdf\0",test,2);
+  /* interrupt(33,8,"test\0",buffer,2);*/
 
    while(1);
 }
@@ -378,6 +378,7 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
    int i = 0;
    int found = 0;
    int y = 1;
+   int wrote = 0;
 
    /* Read the directory and map sectors */
    readSector(dirBuffer,2);
@@ -399,6 +400,11 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
       /* Write the filename to the directory */
       if(dirBuffer[size*32] == 0)
       {
+         /* Clear the directory sector that was found, make sure it is all empty */
+         for(i = 0; i<32; ++i)
+         {
+            dirBuffer[size*32+i] = 0x0;
+         }
          for(i = 0; i<5; ++i)
          {
             if (*name == 0x0)
@@ -412,15 +418,48 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
                *name++;
             }
          }
-         while(y <= numberOfSectors)
+      }
+      if (i == 5)
+      {
+         break;
+      }
+   }
+
+while(y <= numberOfSectors)
+{
+   for(i = 0; i<512; ++i)
+   {
+      if(mapBuffer[i] == 0x0)
+      {
+         mapBuffer[i] = 0xff;
+         writeSector(buffer,i);
+         buffer = buffer + 512;
+         break;
+      }
+   }
+   for(index = 6; index<32; ++index)
+   {
+       if(dirBuffer[index+size*32] == 0x0)
+       {
+          dirBuffer[index+size*32] = i;
+          break;
+       }
+   }
+   ++y;
+}
+
+/*         while(y <= numberOfSectors)
          {
             for(index = 6; index<32; ++index)
             {
-               for(i = 1; i<50; ++i)
+               if (dirBuffer[index+size*32] == 0x0)
+               {
+               for(i = 0; i<512; ++i)
                {
                   if (mapBuffer[i] == 0x0)
                   {
-                     /* Write to the map that the sector is taken, the write that sector to the directory */
+writeInt(y);
+                     Write to the map that the sector is taken, the write that sector to the directory 
                      mapBuffer[i] = 0xff;
                      dirBuffer[size*32+index] = i;
                      writeSector(buffer,i);
@@ -429,9 +468,9 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
                      break;
                   }
                }
+               }
                if (found == 1 && y >= numberOfSectors)
                {
-writeInt(y);
                   break;
                }
             }
@@ -440,14 +479,12 @@ writeInt(y);
                break;
             }
             ++y;
-         }
+         }*/
 
-         /* Write the data to the sectors */
-         writeSector(mapBuffer,1);
-         writeSector(dirBuffer,2);
-         return;
-      }
-   }
+    /* Write the data to the sectors */
+    writeSector(mapBuffer,1);
+    writeSector(dirBuffer,2);
+
    return;
 }
 
