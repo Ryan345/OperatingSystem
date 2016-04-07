@@ -80,9 +80,16 @@ void copy(char* files)
 
    while(*files != ' ')
    {
-      fName1[i] = *files;
-      ++i;
-      files++;
+      if (*files == 0x0)
+      {
+         fName1[i] = ' ';
+      }
+      else
+      {
+         fName1[i] = *files;
+         ++i;
+         files++;
+      }
    }
    PRINTS(fName1);
 }
@@ -102,6 +109,7 @@ void dir()
    int i;
    int runs = 0;
    int size = 0;
+   int total = 0;
 
    READS(buffer,2);
    while(buffer[index] != 0x0)
@@ -112,21 +120,36 @@ void dir()
       }
       for (i = 6; i<32; ++i)
       {
-         if (buffer[index + i] != 0x0)
+         if (buffer[index + i] == 0x0)
          {
-PRINTS("Incremented");
+            break;
+         }
+         else
+         {
             ++size;
          }
       }
-      PRINTS("File name: \0");
-      PRINTS(fname);
-      PRINTS("        File size: \0");
-      PRINTN(size);
-      PRINTS("\r\n\0");
-
+      total = total + size;
+      /* CHeck if filename starts with a capital */
+      if(fname[0] >= 'A' && fname[0] <= 'Z')
+      {
+      }
+      else
+      {
+         PRINTS("File name: \0");
+         PRINTS(fname);
+         PRINTS("        File size: \0");
+         PRINTN(size);
+         PRINTS("\r\n\0");
+      }
+      size = 0;
       runs = runs + 6;
       index = index + 32;
    }
+   PRINTS("\r\nTotal Sectors used: \0");
+   PRINTN(total);
+   PRINTS("\r\nSectors free: \0");
+   PRINTN(48-total);
 }
 
 void delF(char* x)
