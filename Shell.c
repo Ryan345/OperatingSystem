@@ -74,31 +74,52 @@ void main()
 }
 void copy(char* files)
 {
-   char fName1[6];
-   char* fName2;
+   char fName1[7];
+   char fName2[7];
+   char buffer[13312];
+   int size = 0;
    int i = 0;
 
    while(*files != ' ')
    {
-      if (*files == 0x0)
-      {
-         fName1[i] = ' ';
-      }
-      else
-      {
-         fName1[i] = *files;
-         ++i;
-         files++;
-      }
+      fName1[i] = *files;
+      ++i;
+      ++files;
    }
-   PRINTS(fName1);
+   fName1[i] = '\0';
+   i = 0;
+   ++files;
+
+   while(*files != 0x0)
+   {
+      fName2[i] = *files;
+      ++i;
+      ++files;
+   }
+   fName2[i] = '\0';
+   if(fName1[0] >= 'A' && fName1[0] <= 'Z')
+   {
+      ERROR(1);
+   }
+   else
+   {
+      LOADF(fName1,buffer,&size);
+      WRITEF(fName2,buffer,size/512);
+   }
 }
 void tweet(char* fName)
 {
    char buffer[140];
-   PRINTS("Enter text to write to file, end with Enter key.\r\n\0");
-   SCANS(buffer);
-   WRITEF(fName,buffer,1);
+   if(fName[0] >= 'A' && fName[0] <= 'Z')
+   {
+      ERROR(1);
+   }
+   else
+   {
+      PRINTS("Enter text to write to file, end with Enter key.\r\n\0");
+      SCANS(buffer);
+      WRITEF(fName,buffer,1);
+   }
 }
 
 void dir()
@@ -154,7 +175,14 @@ void dir()
 
 void delF(char* x)
 {
-   DELF(x);
+   if(x[0] >= 'A' && x[0] <= 'Z')
+   {
+      ERROR(1);
+   }
+   else
+   {
+      DELF(x);
+   }
 }
 
 void runF(char* x)

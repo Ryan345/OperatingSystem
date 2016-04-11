@@ -389,7 +389,7 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
    {
       if(strcmp(name,&dirBuffer[index]))
       {
-         error(1);
+         error(2);
          return;
       }
       index = index + 32;
@@ -447,39 +447,6 @@ while(y <= numberOfSectors)
    }
    ++y;
 }
-
-/*         while(y <= numberOfSectors)
-         {
-            for(index = 6; index<32; ++index)
-            {
-               if (dirBuffer[index+size*32] == 0x0)
-               {
-               for(i = 0; i<512; ++i)
-               {
-                  if (mapBuffer[i] == 0x0)
-                  {
-writeInt(y);
-                     Write to the map that the sector is taken, the write that sector to the directory 
-                     mapBuffer[i] = 0xff;
-                     dirBuffer[size*32+index] = i;
-                     writeSector(buffer,i);
-                     buffer = buffer + 512;
-                     found = 1;
-                     break;
-                  }
-               }
-               }
-               if (found == 1 && y >= numberOfSectors)
-               {
-                  break;
-               }
-            }
-            if (found == 1 && y >= numberOfSectors)
-            {
-               break;
-            }
-            ++y;
-         }*/
 
     /* Write the data to the sectors */
     writeSector(mapBuffer,1);

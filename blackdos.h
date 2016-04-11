@@ -10,3 +10,4 @@
 #define DELF(x)       interrupt(33,7,x,0,0)
 #define READS(x,y)    interrupt(33,2,x,y,0)
 #define WRITEF(x,y,z) interrupt(33,8,x,y,z)
+#define ERROR(x)      interrupt(33,15,x,0,0)
