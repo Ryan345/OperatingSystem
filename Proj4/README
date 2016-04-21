@@ -6,3 +6,5 @@ A compile version is already provided, however, if you need to compile it.  Type
 After you compile the shell it will create a file called myshell that you can execute.  Type ./myshell and the shell will load.
 You can type help to view a list of the commands, how to use them and what they do.
 To leave the shell either hit Ctrl+C or type Q.
+
+If you have a problem with the S command, to launch firefox.  It may show some output, but you are still able to type after the output.  Just hit enter.
